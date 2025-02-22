@@ -24,6 +24,28 @@ st.dataframe(best_generated.to_frame().T)
 st.write("### 📈 All Newly Generated Experiments (Sorted)")
 st.dataframe(df_generated.sort_values(by=["Conductivite thermique (W/m.K)", "Resistance Mecanique (MPa)"], ascending=[True, False]))
 
+# ---- 📥 DOWNLOAD BUTTONS ---- #
+st.write("## 📥 Download Experiment Data")
+col1, col2 = st.columns(2)
+
+# Download button for existing experiments
+with col1:
+    st.download_button(
+        label="📥 Download Existing Experiments",
+        data=df_existing.to_csv(index=False).encode("utf-8"),
+        file_name="existing_experiments.csv",
+        mime="text/csv"
+    )
+
+# Download button for newly generated experiments
+with col2:
+    st.download_button(
+        label="📥 Download Generated Experiments",
+        data=df_generated.to_csv(index=False).encode("utf-8"),
+        file_name="generated_experiments.csv",
+        mime="text/csv"
+    )
+
 # ---- 📊 VISUALIZATIONS ---- #
 st.write("## 🔍 Data Distribution & Analysis")
 
