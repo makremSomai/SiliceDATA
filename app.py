@@ -10,15 +10,38 @@ st.title("📊 Optimized Silice Material Experiments")
 df_existing = pd.read_csv("extracted_data.csv")
 df_generated = pd.read_csv("generated_experiments.csv")
 
+# Define approximate material costs per metric ton (in USD)
+material_costs_per_ton = {
+    "Ciment (%)": 125,  # $100-$150 per ton
+    "Argile (%)": 40,   # $30-$50 per ton
+    "Alumine (%)": 350, # $300-$400 per ton
+    "Silice (%)": 35,   # $20-$50 per ton
+    "Chamotte (%)": 300 # $200-$400 per ton
+}
+
+# Assume **one piece weighs 2 kg** (adjustable)
+piece_weight_kg = 2  # Change if needed
+kg_per_ton = 1000  # 1 ton = 1000 kg
+
+# Function to calculate total cost per piece
+def calculate_cost_per_piece(row):
+    cost_per_ton = sum(row[material] * material_costs_per_ton[material] / 100 for material in material_costs_per_ton.keys())
+    cost_per_kg = cost_per_ton / kg_per_ton  # Convert to cost per kg
+    return cost_per_kg * piece_weight_kg  # Convert to cost per piece
+
 # Show best existing experiment (lowest conductivity)
 st.write("### ✅ Best Existing Experiment (Lowest Conductivity)")
 best_existing = df_existing.loc[df_existing["Conductivite thermique (W/m.K)"].idxmin()]
+best_existing_cost_per_piece = calculate_cost_per_piece(best_existing)
 st.dataframe(best_existing.to_frame().T)
+st.write(f"💰 **Estimated Cost per Piece:** ${best_existing_cost_per_piece:.2f}")
 
 # Show best generated experiment (lowest conductivity)
 st.write("### 🔬 Best Newly Generated Experiment")
 best_generated = df_generated.loc[df_generated["Conductivite thermique (W/m.K)"].idxmin()]
+best_generated_cost_per_piece = calculate_cost_per_piece(best_generated)
 st.dataframe(best_generated.to_frame().T)
+st.write(f"💰 **Estimated Cost per Piece:** ${best_generated_cost_per_piece:.2f}")
 
 # Show all new experiments sorted
 st.write("### 📈 All Newly Generated Experiments (Sorted)")
@@ -87,5 +110,6 @@ st.markdown(
     - **Low Conductivity & High Resistance Trends**: Higher **Alumine & Silice** tend to result in **lower conductivity**.
     - **Trade-offs**: Increasing certain components (e.g., **Ciment, Argile**) may improve mechanical resistance but could negatively impact thermal conductivity.
     - **Optimization Needed**: Fine-tuning the component ratios can further lower conductivity while maintaining resistance.
+    - **Cost Considerations**: Lowering **Alumine & Chamotte** may reduce costs, but at the expense of material performance.
     """
 )
